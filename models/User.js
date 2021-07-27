@@ -133,6 +133,8 @@ User.getAllUsers = async function(){
         return users;
         
     } catch (error) {
+
+        
         logger.error(error.toString())
         return;
     }
