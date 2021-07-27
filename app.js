@@ -6,7 +6,9 @@ const passport= require('passport')
 const flash= require('express-flash')
 const session=require('express-session')
 const auth = require('./middlewares/auth')
-const methodOverrise = require('method-override')
+const methodOverride = require('method-override')
+const routes= require('./routes/index')
+console.log(routes)
 if(process.env.NODE_ENV !== 'production'){
     require('dotenv').config()
 }
@@ -32,47 +34,48 @@ app.use(session({
 }))
 app.use(passport.initialize())
 app.use(passport.session())
-app.use(methodOverrise('_method'))
+app.use(routes(this.app,passport))
+app.use(methodOverride('_method'))
 
-app.get('/', auth.checkAuthenticated ,(req,res) => {
-    res.render('index.ejs',{name: "santa"})
-})
+// app.get('/', auth.checkAuthenticated ,(req,res) => {
+//     res.render('index.ejs',{name: "santa"})
+// })
 
-app.get('/login',auth.checkNotAuthenticated,(req,res) => {
-    res.render('login.ejs',{name: "santa"})
-})
+// app.get('/login',auth.checkNotAuthenticated,(req,res) => {
+//     res.render('login.ejs',{name: "santa"})
+// })
 
-app.post('/login', auth.checkNotAuthenticated ,passport.authenticate('local',{
-    successRedirect: '/',
-    failureRedirect: '/login',
-    failureFlash: true
-}))
+// app.post('/login', auth.checkNotAuthenticated ,passport.authenticate('local',{
+//     successRedirect: '/',
+//     failureRedirect: '/login',
+//     failureFlash: true
+// }))
 
-app.get('/register',auth.checkNotAuthenticated,(req,res) => {
-    res.render('register.ejs',{name: "santa"})
-})
+// app.get('/register',auth.checkNotAuthenticated,(req,res) => {
+//     res.render('register.ejs')
+// })
 
-app.post('/register',auth.checkNotAuthenticated,async(req,res) => {
-    try {
-        const hashedPwd = await bcrypt.hash(req.body.password, 10);
-        users.push({
-            id: Date.now().toString(),
-            name: req.body.name,
-            email: req.body.email,
-            password: hashedPwd
-        })
-        res.redirect('/login')
-        console.log(users)
-    } catch (error) {
-        res.redirect('/register')
+// app.post('/register',auth.checkNotAuthenticated,async(req,res) => {
+//     try {
+//         const hashedPwd = await bcrypt.hash(req.body.password, 10);
+//         users.push({
+//             id: Date.now().toString(),
+//             name: req.body.name,
+//             email: req.body.email,
+//             password: hashedPwd
+//         })
+//         res.redirect('/login')
+//         console.log(users)
+//     } catch (error) {
+//         res.redirect('/register')
         
         
-    }
-})
-app.delete('/logout',(req,res)=>{
-    req.logOut();
-    res.redirect('/')
-})
+//     }
+// })
+// app.delete('/logout',(req,res)=>{
+//     req.logOut();
+//     res.redirect('/')
+// })
 
 app.listen(3000,()=>{
     console.log("Server Listening to port 3000")
