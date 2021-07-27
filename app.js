@@ -5,6 +5,8 @@ const bcrypt= require('bcrypt')
 const passport= require('passport')
 const flash= require('express-flash')
 const session=require('express-session')
+const auth = require('./middlewares/auth')
+const methodOverrise = require('method-override')
 if(process.env.NODE_ENV !== 'production'){
     require('dotenv').config()
 }
@@ -30,26 +32,27 @@ app.use(session({
 }))
 app.use(passport.initialize())
 app.use(passport.session())
+app.use(methodOverrise('_method'))
 
-app.get('/',(req,res) => {
+app.get('/', auth.checkAuthenticated ,(req,res) => {
     res.render('index.ejs',{name: "santa"})
 })
 
-app.get('/login',(req,res) => {
+app.get('/login',auth.checkNotAuthenticated,(req,res) => {
     res.render('login.ejs',{name: "santa"})
 })
 
-app.post('/login',passport.authenticate('local',{
+app.post('/login', auth.checkNotAuthenticated ,passport.authenticate('local',{
     successRedirect: '/',
     failureRedirect: '/login',
     failureFlash: true
 }))
 
-app.get('/register',(req,res) => {
+app.get('/register',auth.checkNotAuthenticated,(req,res) => {
     res.render('register.ejs',{name: "santa"})
 })
 
-app.post('/register',async(req,res) => {
+app.post('/register',auth.checkNotAuthenticated,async(req,res) => {
     try {
         const hashedPwd = await bcrypt.hash(req.body.password, 10);
         users.push({
@@ -58,15 +61,18 @@ app.post('/register',async(req,res) => {
             email: req.body.email,
             password: hashedPwd
         })
-        res.redirect('login')
+        res.redirect('/login')
         console.log(users)
     } catch (error) {
-        res.redirect('register')
+        res.redirect('/register')
         
         
     }
 })
-
+app.delete('/logout',(req,res)=>{
+    req.logOut();
+    res.redirect('/')
+})
 
 app.listen(3000,()=>{
     console.log("Server Listening to port 3000")
