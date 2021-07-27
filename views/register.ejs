@@ -2,7 +2,15 @@
 <form action="/user/register" method="POST">
   <div>
     <label for="name">Name</label>
-    <input type="text" id="name" name="name" required>
+    <input type="text" id="name" name="username" required>
+  </div>
+  <div>
+    <label for="name">First Name</label>
+    <input type="text" id="name" name="firstname" required>
+  </div>
+  <div>
+    <label for="name">Last Name</label>
+    <input type="text" id="name" name="lastname" required>
   </div>
   <div>
     <label for="email">Email</label>
@@ -11,6 +19,10 @@
   <div>
     <label for="password">Password</label>
     <input type="password" id="password" name="password" required>
+  </div>
+  <div>
+    <label for="password2">Password</label>
+    <input type="password" id="password2" name="password2" required>
   </div>
   <button type="submit">Register</button>
 </form>
