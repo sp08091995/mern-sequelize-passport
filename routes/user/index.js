@@ -26,6 +26,18 @@ module.exports = function(app, passport) {
     router.get('/register',auth.checkNotAuthenticated,(req,res) => {
         res.render('register.ejs',{name: "santa"})
     })
+
+    router.get('/allUsers',async (req,res) => {
+        try {
+            const users= await User.getAllUsers();
+            logger.info(JSON.stringify(users))
+            console.log(JSON.stringify(users))
+            res.render('table.ejs',{users})
+        } catch (error) {
+            logger.error(error.toString())
+        }
+        
+    })
     
     router.post('/register',auth.checkNotAuthenticated, async (req,res) => {
         try {
