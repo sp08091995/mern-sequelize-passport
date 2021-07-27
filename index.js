@@ -8,10 +8,22 @@ const session=require('express-session')
 const auth = require('./middlewares/auth')
 const methodOverride = require('method-override')
 const routes= require('./routes/index')
-console.log(routes)
+const logger = require('./config/logger').mainLogger;
 if(process.env.NODE_ENV !== 'production'){
     require('dotenv').config()
 }
+
+/**Configuring DB */
+const db = require('./config/db')
+
+
+db.authenticate().then(()=>{
+    logger.info('DB Connection has been established successfully.');
+}).catch((err)=>{
+    logger.error(err);
+})
+
+
 
 const users = [];
 

@@ -3,6 +3,9 @@ module.exports = function(app, passport) {
     const router = express.Router();
     const bcrypt = require('bcrypt')
     const auth = require('../../middlewares/auth')
+    const db = require('../../config/db')
+    const User = require('../../models/User')
+    const logger = require('../../config/logger').userLogger
 
     router.get('/', auth.checkAuthenticated ,(req,res) => {
         res.render('index.ejs',{name: "santa"})
@@ -24,18 +27,25 @@ module.exports = function(app, passport) {
         res.render('register.ejs',{name: "santa"})
     })
     
-    router.post('/register',auth.checkNotAuthenticated,async(req,res) => {
+    router.post('/register',auth.checkNotAuthenticated, async (req,res) => {
         try {
-            const hashedPwd = await bcrypt.hash(req.body.password, 10);
-            users.push({
-                id: Date.now().toString(),
-                name: req.body.name,
-                email: req.body.email,
-                password: hashedPwd
-            })
+            let {username,firstname, lastname, email, password, password2} =req.body;
+            console.log(req.body)
+            const user = User.build({
+                username: username,
+                firstname: firstname,
+                lastname: lastname,
+                email: email,
+                password: password,
+                
+            })  
+            const result = await user.save();
+            logger.info(user)
+            logger.info("User Registered")
             res.redirect('/user/login')
-            console.log(users)
+            console.log(user)
         } catch (error) {
+            logger.error("Error in post /register",error.toString())
             res.redirect('/user/register')
             
             
