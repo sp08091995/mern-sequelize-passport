@@ -3,14 +3,14 @@
   <%= messages.error %>
 <% } %>
 <form action="/user/login" method="POST">
-  <div>
+  <div class="field-input">
     <label for="email">Email</label>
     <input type="email" id="email" name="email" required>
   </div>
-  <div>
+  <div class="field-input">
     <label for="password">Password</label>
     <input type="password" id="password" name="password" required>
   </div>
   <button type="submit">Login</button>
 </form>
-<a href="/user/register">Register</a>
+<a href="/user/register">Not Registered? Register here.</a>

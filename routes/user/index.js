@@ -7,12 +7,13 @@ module.exports = function(app, passport) {
     const User = require('../../models/User')
     const logger = require('../../config/logger').userLogger
 
+
     router.get('/', auth.checkAuthenticated ,(req,res) => {
         res.render('index.ejs',{name: "santa"})
     })
     
     router.get('/login',auth.checkNotAuthenticated,(req,res) => {
-        res.render('login.ejs',{name: "santa"})
+        res.render('login.ejs',{name: "santa",title: "Home Page"})
     })
 
     router.post('/login', auth.checkNotAuthenticated ,passport.authenticate('local',{
@@ -24,15 +25,15 @@ module.exports = function(app, passport) {
     
     
     router.get('/register',auth.checkNotAuthenticated,(req,res) => {
-        res.render('register.ejs',{name: "santa"})
+        res.render('register.ejs',{name: "santa",title: "Home Page"})
     })
 
-    router.get('/allUsers',async (req,res) => {
+    router.get('/allUsers',auth.checkAuthenticated ,async (req,res) => {
         try {
             const users= await User.getAllUsers();
             logger.info(JSON.stringify(users))
             console.log(JSON.stringify(users))
-            res.render('table.ejs',{users})
+            res.render('table.ejs',{users,title: "Home"})
         } catch (error) {
             logger.error(error.toString())
         }
