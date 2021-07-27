@@ -8,7 +8,7 @@ const checkAuthenticated = (req,res,next)=>{
         }
         return res.redirect('/user/login');
     } catch (error) {
-        logger.error("Error in checkAuthenticated: ",error.toString())
+        logger.error("Error in checkAuthenticated: "+error.toString())
     }
 
 }
@@ -20,7 +20,7 @@ const checkNotAuthenticated = (req,res,next)=>{
         }
         return next();
     } catch (error) {
-        logger.error("Error in checkNotAuthenticated: ",error.toString())
+        logger.error("Error in checkNotAuthenticated: "+error.toString())
     }
 
 }

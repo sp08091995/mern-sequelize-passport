@@ -29,29 +29,68 @@ module.exports = function(app, passport) {
     
     router.post('/register',auth.checkNotAuthenticated, async (req,res) => {
         try {
+            let errors=[]
             let {username,firstname, lastname, email, password, password2} =req.body;
-            console.log(req.body)
-            const user = User.build({
-                username: username,
-                firstname: firstname,
-                lastname: lastname,
-                email: email,
-                password: password,
-                
-            })  
-            const result = await user.save();
-            logger.info(user)
-            logger.info("User Registered")
-            res.redirect('/user/login')
-            console.log(user)
+            /**Validations */
+            if(!username || !firstname || !lastname || !password ||!email || !password2){
+                errors.push({message : "Please enter all fields"})
+            }
+            if(password.length < 6){
+                errors.push({message : "Password should be 6 characters"})
+                logger.error("Password is not 6 characters")
+            }
+            try{
+                const hasUser = await User.findOne({where : {email: email}})
+                if (hasUser){
+                    errors.push({message : "Email already Registered"})
+                    logger.error("Email already Registered: "+ JSON.stringify(hasUser.toJSON()));
+                }
+            }catch(err){
+                logger.error(err.toString())
+            }
+            try{
+                const hasUser = await User.findOne({where : {username}})
+                if (hasUser){
+                    errors.push({message : "Username already Registered"})
+                    logger.error("Username already Registered: "+JSON.stringify(hasUser.toJSON()));
+                }
+            }catch(err){
+                logger.error(err.toString())
+            }
+            if(errors.length > 0){
+                res.status(422).send(errors)
+            }else{
+                try {
+                    
+                    const user = User.build({
+                        username: username,
+                        firstname: firstname,
+                        lastname: lastname,
+                        email: email,
+                        password: password,
+                        
+                    })  
+                    logger.info("Saving user: "+JSON.stringify(user.toJSON()))
+                    const result = await user.save();
+                    if(!result){
+                        logger.error("Error while Saving user: ",result)
+                        res.status(422).send(errors.push({message : "Unable to save User"}))
+                    }
+                    logger.info("User Registered")
+                    res.user = req.user
+                    res.redirect('/user/login')
+                } catch (error) {
+                    logger.error("Error while Saving user: "+error.toString())
+                }
+            }
         } catch (error) {
-            logger.error("Error in post /register",error.toString())
+            logger.error("Error in post /register: "+error.toString())
             res.redirect('/user/register')
             
             
         }
     })
-    router.delete('/logout',(req,res)=>{
+    router.post('/logout',(req,res)=>{
         req.logOut();
         res.redirect('/')
     })

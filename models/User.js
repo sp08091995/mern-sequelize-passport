@@ -113,16 +113,30 @@ User.findByCredentials = async function (email,password) {
     }
 }
 
+User.findById = async function (id) {
+    try {
+        const user = await User.findOne({ id })
+        if(!user){
+            logger.error("Unable to find User with Id: "+id)
+            return 
+        }
+        
+        return user;
+    } catch (error) {
+        logger.error(error.toString())
+    }
+}
+
 User.getAllUsers = async function(){
     try {
         const users= User.findAll({attributes:['username','firstname','lastname','email','createdAt','updatedAt']});
         return users;
         
     } catch (error) {
-        logger.error(error)
+        logger.error(error.toString())
         return;
     }
 }
 
-User.sync()
+// User.sync()
 module.exports=User;
