@@ -7,9 +7,28 @@ module.exports = function(app, passport) {
     const User = require('../../models/User')
     const logger = require('../../config/logger').userLogger
 
-
+    
     router.get('/', auth.checkAuthenticated ,(req,res) => {
         res.render('index.ejs',{name: "santa"})
+    })
+
+    
+    router.get('/edit/:email', auth.checkAuthenticated ,async (req,res) => {
+        let email= req.params.email;
+        console.log(email)
+        logger.info("Url param: "+email);
+        try {
+            const user= await User.findOne({ email })
+            if(!user){
+                return res.status(422).send({message: "Failed to retrieve user"})
+                
+            }
+            res.render('register.ejs',{title: "Home", user})
+
+        } catch (error) {
+            logger.info("Error in  /edit/:email: "+error.toString());
+            res.status(422).send({message: "Failed to retrieve user"})
+        }
     })
     
     router.get('/login',auth.checkNotAuthenticated,(req,res) => {
@@ -43,8 +62,19 @@ module.exports = function(app, passport) {
     router.post('/register',auth.checkNotAuthenticated, async (req,res) => {
         try {
             let errors=[]
-            let {username,firstname, lastname, email, password, password2} =req.body;
+            let {username,firstname, lastname, email, oldpassword, password, password2} =req.body;
+            let userModified;
             /**Validations */
+            if(oldpassword){
+                try {
+                    userModified = User.findByCredentials(email,oldpassword)
+                    if(!userModified){
+                        return res.status(422).send({message: "Old Password is incorrect"})
+                    }
+                } catch (error) {
+                    logger.error(error.toString())
+                }
+            }
             if(!username || !firstname || !lastname || !password ||!email || !password2){
                 errors.push({message : "Please enter all fields"})
             }
@@ -71,10 +101,26 @@ module.exports = function(app, passport) {
                 logger.error(err.toString())
             }
             if(errors.length > 0){
-                res.status(422).send(errors)
+                return res.status(422).send(errors)
             }else{
                 try {
-                    
+                    if(userModified){
+                        const updateResult=await userModified.update({
+                            username: username,
+                            firstname: firstname,
+                            lastname: lastname,
+                            email: email,
+                            password: password,
+                        })
+                        const result=await user.save();
+                        if(!result){
+                            logger.error("Error while Saving user: ",result)
+                            res.status(422).send(errors.push({message : "Unable to save modified User"}))
+                        }
+                        logger.info("User Modified")
+                        res.user = userModified
+                        return res.redirect('/user/login')
+                    }
                     const user = User.build({
                         username: username,
                         firstname: firstname,
@@ -91,9 +137,11 @@ module.exports = function(app, passport) {
                     }
                     logger.info("User Registered")
                     res.user = req.user
-                    res.redirect('/user/login')
+                    return res.redirect('/user/login')
                 } catch (error) {
                     logger.error("Error while Saving user: "+error.toString())
+                    return res.status(422).send({message: error.toString()})
+                    
                 }
             }
         } catch (error) {

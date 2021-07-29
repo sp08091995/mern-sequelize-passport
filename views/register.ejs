@@ -1,29 +1,51 @@
 <h1>Register</h1>
-<form action="/user/register" method="POST">
+<form action="/user/register/" method="POST">
   <div class="field-input">
     <label for="name">Name</label>
-    <input type="text" id="name" name="username" required>
+    <input type="text" id="name" name="username" required value="<% if (locals.user) { %> <%= user.username %> <% } %>">
   </div>
   <div class="field-input">
     <label for="name">First Name</label>
-    <input type="text" id="name" name="firstname" required>
+    <input type="text" id="name" name="firstname" required value="<% if (locals.user) { %> <%= user.firstname %> <% } %>">
   </div>
   <div class="field-input">
     <label for="name">Last Name</label>
-    <input type="text" id="name" name="lastname" required>
+    <input type="text" id="name" name="lastname" required value="<% if (locals.user) { %> <%= user.lastname %> <% } %>">
   </div>
   <div class="field-input">
     <label for="email">Email</label>
-    <input type="email" id="email" name="email" required>
+    <input type="email" id="email" name="email" required value="<% if (locals.user) { %> <%= user.email %> <% } %>">
+  </div>
+  <% if (locals.user) { %>
+    <div class="field-input">
+      <label for="oldpassword">Old Password</label>
+      <input type="password" id="oldpassword" name="oldpassword">
+    </div>
+  <% } %>
+    
+  
+
+  <div class="field-input">
+    <label for="password">New Password</label>
+    <input type="password" id="password" name="password" 
+    <% if (!locals.user) { %>
+      required
+    <% } %>
+    >
   </div>
   <div class="field-input">
-    <label for="password">Password</label>
-    <input type="password" id="password" name="password" required>
+    <label for="password2">Retype Password</label>
+    <input type="password" id="password2" name="password2"
+    <% if (!locals.user) { %>
+      required
+    <% } %>
+    >
   </div>
-  <div class="field-input">
-    <label for="password2">Password</label>
-    <input type="password" id="password2" name="password2" required>
-  </div>
-  <button type="submit">Register</button>
+  <button type="submit">
+    <% if (!locals.user) { %>
+      Register
+    <% } else { %>
+      Submit
+    <% } %>
+  </button>
 </form>
-<a href="/user/login">Already Registered? Login here.</a>
