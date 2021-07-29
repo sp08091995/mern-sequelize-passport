@@ -8,6 +8,7 @@ const session=require('express-session')
 const auth = require('./middlewares/auth')
 const routes= require('./routes/index')
 const logger = require('./config/logger').mainLogger;
+const expressLayouts  = require('express-ejs-layouts');
 if(process.env.NODE_ENV !== 'production'){
     require('dotenv').config()
 }
@@ -25,7 +26,15 @@ db.authenticate().then(()=>{
 const passportInit = require('./config/passport')
 passportInit(passport);
 
+app.use(express.static(__dirname + '/public'));
+app.use('/user',express.static(__dirname+'public/'))
+
+
+
+app.use(expressLayouts)
+app.set('layout', './layouts/full-width.ejs')
 app.set('view-engine','ejs')
+
 app.use(urlencoded({extended:false}))
 app.use(flash())
 app.use(session({
@@ -34,9 +43,14 @@ app.use(session({
     saveUninitialized: false    
 
 }))
+
+
+
+
 app.use(passport.initialize())
 app.use(passport.session())
 app.use(routes(this.app,passport))
+
 
 app.listen(3000,()=>{
     console.log("Server Listening to port 3000")

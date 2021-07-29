@@ -129,7 +129,12 @@ User.findById = async function (id) {
 
 User.getAllUsers = async function(){
     try {
-        const users= User.findAll({attributes:['username','firstname','lastname','email','createdAt','updatedAt']});
+        const users= User.findAll({attributes:['username','firstname','lastname','email','createdAt','updatedAt']},{
+            where: {
+                1: 1
+              }
+        }
+        );
         return users;
         
     } catch (error) {
@@ -140,5 +145,5 @@ User.getAllUsers = async function(){
     }
 }
 
-// User.sync()
+User.sync()
 module.exports=User;
