@@ -145,5 +145,5 @@ User.getAllUsers = async function(){
     }
 }
 
-// User.sync()
+User.sync()
 module.exports=User;

@@ -36,6 +36,7 @@ app.set('layout', './layouts/full-width.ejs')
 app.set('view-engine','ejs')
 
 app.use(urlencoded({extended:false}))
+app.use(bodyParser.json())
 app.use(flash())
 app.use(session({
     secret: process.env.SESSION_SECRET,
