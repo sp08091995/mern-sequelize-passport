@@ -9,6 +9,7 @@ const auth = require('./middlewares/auth')
 const routes= require('./routes/index')
 const logger = require('./config/logger').mainLogger;
 const expressLayouts  = require('express-ejs-layouts');
+const bodyParser = require('body-parser');
 if(process.env.NODE_ENV !== 'production'){
     require('dotenv').config()
 }
@@ -31,11 +32,12 @@ app.use('/user',express.static(__dirname+'public/'))
 
 
 
-app.use(expressLayouts)
-app.set('layout', './layouts/full-width.ejs')
-app.set('view-engine','ejs')
+// app.use(expressLayouts)
+// app.set('layout', './layouts/full-width.ejs')
+// app.set('view-engine','ejs')
 
 app.use(urlencoded({extended:false}))
+app.use(bodyParser.json())
 app.use(flash())
 app.use(session({
     secret: process.env.SESSION_SECRET,
