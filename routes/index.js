@@ -4,10 +4,12 @@ module.exports = function(app, passport) {
     const logger = require('../config/logger').mainLogger;
   
     /* ---- other existing routes included ---- */
-    const r_user = require('./user/index'); /*my custom route*/
+    const r_user = require('./user'); /*my custom route*/
+    const r_article = require('./article'); /*my custom route*/
   
     /* ---- all other routes ---- */
     mainroute.use('/user', r_user(app, passport)); /*my custom route*/
+    mainroute.use('/article', r_article(app, passport)); /*my custom route*/
   
     mainroute.get('/', auth.checkAuthenticated,async function(req, res) {
       try {
